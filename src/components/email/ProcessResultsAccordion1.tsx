@@ -103,10 +103,21 @@ export function ProcessResultsAccordion1({
       
       <div className="space-y-4">
         {processResults.map((item, index) => {
-          const analysis_result = typeof item.analysis_result === 'string' ? JSON.parse(item.analysis_result) : item.analysis_result;
-          const original_email = typeof item.original_email === 'string' ? JSON.parse(item.original_email) : item.original_email;
-          const translated_content = typeof item.translated_content === 'string' ? JSON.parse(item.translated_content) : item.translated_content;
+          let analysis_result: any = {};
+          try {
+            analysis_result = typeof item.analysis_result === 'string' && item.analysis_result 
+              ? JSON.parse(item.analysis_result) 
+              : (item.analysis_result || {});
+          } catch (e) {
+            console.error("Failed to parse analysis_result", e);
+          }
+          const original_email = typeof item.original_email === 'string' && item.original_email ? JSON.parse(item.original_email) : (item.original_email || {});
+          const translated_content = typeof item.translated_content === 'string' && item.translated_content ? JSON.parse(item.translated_content) : (item.translated_content || {});
           const isRawAnalysisVisible = showRawAnalysis[index] || false;
+          
+          const requires_human_review = analysis_result.requires_human_review ?? (item as any).requires_human_review ?? false;
+          const confidence = analysis_result.confidence_scores?.overall || 0;
+          const createdAt = item.created_at || (item as any).createdAt || new Date().toISOString();
 
           return (
             <div key={`${item.id}-${item.process_label}-${index}`} className="border border-gray-200 rounded-xl overflow-hidden">
@@ -117,27 +128,27 @@ export function ProcessResultsAccordion1({
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-8 rounded-full ${
-                    analysis_result.requires_human_review ? 'bg-yellow-500' : 'bg-green-500'
+                    requires_human_review ? 'bg-yellow-500' : 'bg-green-500'
                   }`} />
                   <div>
                     <span className="font-semibold text-gray-900 text-lg">
                       {item.process_label} 
                     </span>
                     <div className="text-sm text-gray-500 mt-1">
-                      {new Date(item.created_at).toLocaleString()}
+                      {new Date(createdAt).toLocaleString()}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                    analysis_result.requires_human_review 
+                    requires_human_review 
                       ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
                       : 'bg-green-100 text-green-800 border border-green-200'
                   }`}>
-                    {analysis_result.requires_human_review ? 'Needs Review' : 'Auto-processed'}
+                    {requires_human_review ? 'Needs Review' : 'Auto-processed'}
                   </span>
                   <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1.5 rounded-full border border-blue-200">
-                    {formatConfidence(analysis_result.confidence_scores.overall)} confidence
+                    {formatConfidence(confidence)} confidence
                   </span>
                   <ChevronDownIcon 
                     className={`w-5 h-5 text-gray-400 transform transition-transform duration-200 ${
@@ -181,7 +192,7 @@ export function ProcessResultsAccordion1({
                             <div className="flex justify-between">
                               <span className="text-gray-600">Created:</span>
                               <span className="font-medium">
-                                {new Date(item.created_at).toLocaleString()}
+                                {new Date(createdAt).toLocaleString()}
                               </span>
                             </div>
                           </div>

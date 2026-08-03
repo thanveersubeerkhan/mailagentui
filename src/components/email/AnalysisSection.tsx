@@ -113,10 +113,31 @@ const AccordionSection = ({ title, isOpen, onToggle, children, badge }: Accordio
 };
 
 export const AnalysisSection = ({ email }: AnalysisSectionProps) => {
- 
-     
-        const analysis_result = typeof email.analysis_result === 'string' ? JSON.parse(email.analysis_result) : email.analysis_result;
+  let parsed_analysis: any = {};
+  try {
+    parsed_analysis = typeof email.analysis_result === 'string' && email.analysis_result 
+      ? JSON.parse(email.analysis_result) 
+      : (email.analysis_result || {});
+  } catch (e) {
+    console.error("Failed to parse analysis_result", e);
+  }
   
+  const analysis_result = {
+    summary: parsed_analysis.summary || "No summary available.",
+    action_items: parsed_analysis.action_items || [],
+    classification: parsed_analysis.classification || {
+      category: "Unknown", priority: "Unknown", sentiment: "Unknown", confidence: 0
+    },
+    structured_data: parsed_analysis.structured_data || {},
+    action_reasoning: parsed_analysis.action_reasoning || "No reasoning available.",
+    next_best_action: parsed_analysis.next_best_action || "No action available.",
+    action_confidence: parsed_analysis.action_confidence || 0,
+    confidence_scores: parsed_analysis.confidence_scores || {
+      overall: 0, action_items: 0, classification: 0, structured_data: 0
+    },
+    ...parsed_analysis
+  };
+
   const [openSections, setOpenSections] = useState({
     summary: false,
     classification: false,

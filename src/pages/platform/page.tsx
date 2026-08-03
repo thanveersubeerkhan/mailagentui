@@ -119,20 +119,33 @@ const [Close, setClose] = useState(false);
 
     const fetchExistingProcessResults = async (reqId: string, isCompare = false) => {
         try {
-                   setOldprocessfetch(true);
-                       setCompareProcessResults(null);
-                        setCompareProcessResults(null);
-            const response = await fetch(`https://portal.mawarid.com.sa/EmailAgent/get-mails-from-reprocess?req_id=${reqId}`);
+            setOldprocessfetch(true);
+            setCompareProcessResults(null);
+            
+            const response = await fetch(`/platform-api/entities/data/a797bc59-cb99-4c94-a5a2-bed779ddb674?page=1&pageSize=20&filter%5Breq_id%5D=${reqId}`, {
+                headers: {
+                    "accept": "*/*",
+                    "accept-language": "en-US,en;q=0.9,en-IN;q=0.8",
+                    "x-internal-service-key": "platform4x-internal-key-2026",       
+                    "x-tenant-id": "default"
+                }
+            });
+            
             if (response.ok) {
-                const result = await response.json();
+                const rawResult = await response.json();
+                const result = { success: true, data: rawResult.data || [] };
+                
                 setOldprocessfetch(false);
                 if (isCompare) {
                     setCompareProcessResults(result);
                 } else {
                     setExistingProcessResults(result);
                 }
+            } else {
+                setOldprocessfetch(false);
             }
         } catch (error) {
+            setOldprocessfetch(false);
             console.error('Failed to fetch existing process results:', error);
         }
     };
@@ -161,11 +174,19 @@ const [Close, setClose] = useState(false);
         }
 
         try {
-            const response = await fetch(`https://portal.mawarid.com.sa/EmailAgent/process-single-mail?req_id=${email.RecId}`, {
-                method: 'get',
+            const response = await fetch(`/platform-api/entities/data/e92985b3-8121-42e2-af8a-7e12896a3638`, {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    "accept": "*/*",
+                    "accept-language": "en-US,en;q=0.9,ta;q=0.8,ar;q=0.7",
+                    "x-internal-service-key": "platform4x-internal-key-2026",  
+                    "cache-control": "no-cache",
+                    "content-type": "application/json",
+                    "pragma": "no-cache",
+                    "priority": "u=1, i",
+                    "x-tenant-id": "default"
                 },
+                body: JSON.stringify({ mai_id: email.RecId })
             });
 
             if (!response.ok) {
