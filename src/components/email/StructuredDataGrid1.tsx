@@ -59,7 +59,7 @@ const FieldValueRenderer = ({ data, fieldKey, confidence }: { data: any; fieldKe
 
     const displayValue = arr
       .map(item => {
-        if (typeof item === 'object') {
+        if (typeof item === 'object' && item !== null) {
           return item.name || item.value || item.text || 'Item';
         }
         return String(item);
@@ -112,14 +112,27 @@ const FieldValueRenderer = ({ data, fieldKey, confidence }: { data: any; fieldKe
 
   // Handle primitive values
   const renderPrimitive = (value: any, title: string, conf?: number) => {
+    const displayStr = formatValue(value);
+    const isUrl = typeof displayStr === 'string' && /^https?:\/\//i.test(displayStr.trim());
+
     return (
       <div className="flex flex-col sm:flex-row sm:items-center justify-between py-3 border-b border-gray-100">
         <span className="font-medium text-gray-700 text-sm mb-1 sm:mb-0 sm:w-1/3">
           {formatKey(title)}
         </span>
-        <div className="flex items-center justify-between sm:justify-end sm:w-2/3 gap-4">
-          <span className="text-gray-900 text-sm flex-1">{formatValue(value)}</span>
-        
+        <div className="flex items-center justify-between sm:justify-end sm:w-2/3 gap-4 overflow-hidden">
+          {isUrl ? (
+            <a 
+              href={displayStr.trim()} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
+            >
+              Open Link
+            </a>
+          ) : (
+            <span className="text-gray-900 text-sm flex-1 break-all sm:break-words">{displayStr}</span>
+          )}
         </div>
       </div>
     );
