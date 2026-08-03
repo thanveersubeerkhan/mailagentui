@@ -4,13 +4,4 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: {
-    proxy: {
-      '/platform-api': {
-        target: 'https://portaldev.mawarid.com.sa:6080',
-        changeOrigin: true,
-        secure: false,
-      }
-    }
-  }
 })
