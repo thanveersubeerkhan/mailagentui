@@ -180,10 +180,7 @@ const [Close, setClose] = useState(false);
                     "accept": "*/*",
                     "accept-language": "en-US,en;q=0.9,ta;q=0.8,ar;q=0.7",
                     "x-internal-service-key": "platform4x-internal-key-2026",  
-                    "cache-control": "no-cache",
                     "content-type": "application/json",
-                    "pragma": "no-cache",
-                    "priority": "u=1, i",
                     "x-tenant-id": "default"
                 },
                 body: JSON.stringify({ mai_id: email.RecId })
