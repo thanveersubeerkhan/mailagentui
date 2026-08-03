@@ -25,10 +25,38 @@ const FieldValueRenderer = ({ data, fieldKey, confidence }: { data: any; fieldKe
     return String(value);
   };
 
-  // Handle arrays by joining values
+  // Handle arrays
   const renderArray = (arr: any[], title: string) => {
     if (arr.length === 0) return null;
     
+    // Check if the array contains key-value objects (like extracted_items)
+    const isKeyValueArray = arr.every(item => 
+      typeof item === 'object' && item !== null && ('field' in item || 'key' in item || 'name' in item) && 'value' in item
+    );
+
+    if (isKeyValueArray) {
+      return (
+        <div className="border border-gray-200 rounded-lg overflow-hidden my-2 w-full">
+          <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+            <h4 className="font-medium text-gray-900 text-sm">{formatKey(title)}</h4>
+          </div>
+          <div className="divide-y divide-gray-100 px-4">
+            {arr.map((item, idx) => {
+              const itemKey = item.field || item.key || item.name || `Item ${idx + 1}`;
+              return (
+                <FieldValueRenderer
+                  key={idx}
+                  data={item.value}
+                  fieldKey={itemKey}
+                  confidence={item.confidence}
+                />
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
     const displayValue = arr
       .map(item => {
         if (typeof item === 'object') {
