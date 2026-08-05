@@ -122,7 +122,7 @@ const [Close, setClose] = useState(false);
             setOldprocessfetch(true);
             setCompareProcessResults(null);
             
-            const response = await fetch(`https://portaldev.mawarid.com.sa:6080/platform-api/entities/data/a797bc59-cb99-4c94-a5a2-bed779ddb674?page=1&pageSize=20&filter%5Breq_id%5D=${reqId}`, {
+            const response = await fetch(`https://platform-4x-api-andfaucacxhhgwef.canadacentral-01.azurewebsites.net/entities/data/a797bc59-cb99-4c94-a5a2-bed779ddb674?page=1&pageSize=20&filter%5Breq_id%5D=${reqId}`, {
                 headers: {
                     "accept": "*/*",
                     "accept-language": "en-US,en;q=0.9,en-IN;q=0.8",
@@ -174,7 +174,7 @@ const [Close, setClose] = useState(false);
         }
 
         try {
-            const response = await fetch(`https://portaldev.mawarid.com.sa:6080/platform-api/entities/data/e92985b3-8121-42e2-af8a-7e12896a3638`, {
+            const response = await fetch(`https://platform-4x-api-andfaucacxhhgwef.canadacentral-01.azurewebsites.net/entities/data/e92985b3-8121-42e2-af8a-7e12896a3638`, {
                 method: 'POST',
                 headers: {
                     "accept": "*/*",
