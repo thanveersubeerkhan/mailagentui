@@ -93,6 +93,8 @@ export default function PlatformPage() {
     const [oldprocessfetch, setOldprocessfetch] = useState(false);
     const [Close, setClose] = useState(false);
     const [filterType, setFilterType] = useState<"Tickets" | "Reply">("Tickets");
+    const [searchTicket, setSearchTicket] = useState("");
+    const [searchInput, setSearchInput] = useState("");
     const size = 5;
 
     const fetchEmails = async () => {
@@ -100,8 +102,11 @@ export default function PlatformPage() {
         const baseUrl =
             "https://portal.mawarid.com.sa/apps4x-api/api/v1/data/LGE0000001?entityid=ETN0000041";
         try {
-            const res = await fetch(
-                `${baseUrl}&$page=${page}&$size=${size}&$orderby=${orderBy}&$orderbydirection=${orderDir}&$filter:Type=eq:${filterType}`,
+            let url = `${baseUrl}&$page=${page}&$size=${size}&$orderby=${orderBy}&$orderbydirection=${orderDir}&$filter:Type=eq:${filterType}`;
+            if (searchTicket) {
+                url += `&$filter:TicketID=li:${searchTicket}`;
+            }
+            const res = await fetch(url,
                 {
                     headers: {
                         Authorization: `Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJTeXN0ZW0iLCJOYW1lIjoiU3lzdGVtIiwiRW1haWwiOiJzeXN0ZW1AbWFpbC5jb20iLCJNb2JpbGVOdW1iZXIiOiIwOTg3NjU0MzIxIiwiQ29tcGFueUlkIjoiTEdFMDAwMDAwMSxMR0UwMDAwMDAyIiwiZXhwIjozMzE1Mzk0NjE2LCJpc3MiOiJhcHBzNHguY29tIiwiYXVkIjoiYXBwczR4LmNvbSJ9.YkzrYJ-93k4oNjNSbYWlEum8eh_IAdodZ5vGUIGvVMQ`,
@@ -153,7 +158,7 @@ export default function PlatformPage() {
 
     useEffect(() => {
         fetchEmails();
-    }, [page, orderBy, orderDir, filterType]);
+    }, [page, orderBy, orderDir, filterType, searchTicket]);
 
     useEffect(() => {
         if (selectedEmail) {
@@ -268,19 +273,42 @@ export default function PlatformPage() {
                                     <h2 className="text-lg font-semibold text-gray-900">Email Inbox</h2>
                                     <span className="text-sm text-gray-500">{emails.length} emails</span>
                                 </div>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => { setFilterType("Tickets"); setPage(1); }}
-                                        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filterType === 'Tickets' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                    >
-                                        Tickets
-                                    </button>
-                                    <button
-                                        onClick={() => { setFilterType("Reply"); setPage(1); }}
-                                        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filterType === 'Reply' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                                    >
-                                        Replies
-                                    </button>
+                                <div className="flex flex-col gap-3">
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() => { setFilterType("Tickets"); setPage(1); }}
+                                            className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filterType === 'Tickets' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                                        >
+                                            Tickets
+                                        </button>
+                                        <button
+                                            onClick={() => { setFilterType("Reply"); setPage(1); }}
+                                            className={`flex-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filterType === 'Reply' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                                        >
+                                            Replies
+                                        </button>
+                                    </div>
+                                    <div className="flex gap-2 w-full">
+                                        <input
+                                            type="text"
+                                            placeholder="Search Ticket ID..."
+                                            value={searchInput}
+                                            onChange={(e) => setSearchInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    setSearchTicket(searchInput);
+                                                    setPage(1);
+                                                }
+                                            }}
+                                            className="flex-1 min-w-0 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                        <button
+                                            onClick={() => { setSearchTicket(searchInput); setPage(1); }}
+                                            className="px-4 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+                                        >
+                                            Search
+                                        </button>
+                                    </div>
                                 </div>
                             </CardHeader>
                             <div className="overflow-hidden ">
