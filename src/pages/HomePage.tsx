@@ -37,7 +37,7 @@ export default function HomePage() {
             </div>
           </div>
         </Link>
-
+{/* 
         <Link 
           to="/server"
           className="group relative bg-white backdrop-blur-xl border border-gray-200 rounded-3xl p-8 hover:bg-gray-50 transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(99,102,241,0.15)] shadow-sm"
@@ -56,7 +56,7 @@ export default function HomePage() {
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
             </div>
           </div>
-        </Link>
+        </Link> */}
 
         <Link 
           to="/results"

@@ -155,12 +155,7 @@ export const AnalysisSection = ({ email, validations }: AnalysisSectionProps) =>
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <h3 className="text-lg font-semibold text-gray-900">AI Analysis Results</h3>
-        <p className="text-sm text-gray-600 mt-1">Processed in {email.processing_time_ms}ms</p>
-      </CardHeader>
-
+    <div className="divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
       <div className="divide-y divide-gray-200">
         {/* Summary Accordion */}
         <AccordionSection
@@ -298,6 +293,6 @@ export const AnalysisSection = ({ email, validations }: AnalysisSectionProps) =>
           </div>
         </AccordionSection>
       </div>
-    </Card>
+    </div>
   );
 };

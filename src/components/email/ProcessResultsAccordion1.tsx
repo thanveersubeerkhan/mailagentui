@@ -195,88 +195,42 @@ export function ProcessResultsAccordion1({
               {expandedProcess === index && (
                 <div className="border-t border-gray-200">
                   <div className="p-6 space-y-4">
-                    {/* Process Information Accordion */}
+                    {/* Analysis Section Accordion */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={() => toggleSection(index, 'processInfo')}
-                        className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors flex justify-between items-center text-left"
+                        onClick={() => toggleSection(index, 'analysisSection')}
+                        className="w-full px-4 py-3 bg-orange-50 hover:bg-orange-100 transition-colors flex justify-between items-center text-left"
                       >
-                        <span className="font-semibold text-gray-900">Process Information</span>
+                        <span className="font-semibold text-gray-900">AI Analysis</span>
                         <ChevronDownIcon 
                           className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
-                            isSectionExpanded(index, 'processInfo') ? 'rotate-180' : ''
+                            isSectionExpanded(index, 'analysisSection') ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
-                      {isSectionExpanded(index, 'processInfo') && (
+                      {isSectionExpanded(index, 'analysisSection') && (
                         <div className="bg-white p-4 border-t border-gray-200">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                            {Object.entries(item).map(([key, value]) => {
-                              // Skip fields that have their own accordions or are irrelevant here
-                              if (['pretext', 'core', 'posttext', 'clean_text', 'original_email', 'translated_content', 'analysis_result', 'reply', 'reply_draft', 'Replypayload', 'replypayload', 'replyPayload'].includes(key)) {
-                                return null;
-                              }
-                              
-                              let displayValue = String(value ?? '');
-                              if (typeof value === 'object' && value !== null) {
-                                displayValue = JSON.stringify(value);
-                              } else if (key === 'createdAt' || key === 'created_at' || key === 'modifiedAt') {
-                                displayValue = new Date(String(value)).toLocaleString();
-                              } else if (typeof value === 'boolean') {
-                                displayValue = value ? 'Yes' : 'No';
-                              }
-
-                              return (
-                                <div key={key} className="flex flex-col border-b border-gray-100 pb-2">
-                                  <span className="text-gray-500 font-medium capitalize mb-1">{key.replace(/_/g, ' ')}</span>
-                                  <span className="font-semibold text-gray-900 break-words">{displayValue || '-'}</span>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <AnalysisSection email={item} validations={actionItems[item.recId]} />
                         </div>
                       )}
                     </div>
 
-                    {/* Text Segments Accordion */}
+                    {/* Email Content Accordion */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={() => toggleSection(index, 'textSegments')}
-                        className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors flex justify-between items-center text-left"
+                        onClick={() => toggleSection(index, 'emailContent')}
+                        className="w-full px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors flex justify-between items-center text-left"
                       >
-                        <span className="font-semibold text-gray-900">Text Segments</span>
+                        <span className="font-semibold text-gray-900">Email Content</span>
                         <ChevronDownIcon 
                           className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
-                            isSectionExpanded(index, 'textSegments') ? 'rotate-180' : ''
+                            isSectionExpanded(index, 'emailContent') ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
-                      {isSectionExpanded(index, 'textSegments') && (
-                        <div className="bg-white p-4 border-t border-gray-200 space-y-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Pretext</label>
-                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[60px] max-h-[120px] overflow-y-auto">
-                              {item.pretext || <span className="text-gray-400 italic">No pretext</span>}
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Core Text</label>
-                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[60px] max-h-[120px] overflow-y-auto">
-                              {item.core || <span className="text-gray-400 italic">No core text</span>}
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Posttext</label>
-                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[60px] max-h-[120px] overflow-y-auto">
-                              {item.posttext || <span className="text-gray-400 italic">No posttext</span>}
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Clean Text</label>
-                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[80px] max-h-[160px] overflow-y-auto">
-                              {item.clean_text || <span className="text-gray-400 italic">No clean text</span>}
-                            </div>
-                          </div>
+                      {isSectionExpanded(index, 'emailContent') && (
+                        <div className="bg-white p-4 border-t border-gray-200">
+                          <EmailContent email={item} />
                         </div>
                       )}
                     </div>
@@ -391,42 +345,88 @@ export function ProcessResultsAccordion1({
                       )}
                     </div>
 
-                    {/* Email Content Accordion */}
+                    {/* Text Segments Accordion */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={() => toggleSection(index, 'emailContent')}
-                        className="w-full px-4 py-3 bg-purple-50 hover:bg-purple-100 transition-colors flex justify-between items-center text-left"
+                        onClick={() => toggleSection(index, 'textSegments')}
+                        className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors flex justify-between items-center text-left"
                       >
-                        <span className="font-semibold text-gray-900">Email Content</span>
+                        <span className="font-semibold text-gray-900">Text Segments</span>
                         <ChevronDownIcon 
                           className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
-                            isSectionExpanded(index, 'emailContent') ? 'rotate-180' : ''
+                            isSectionExpanded(index, 'textSegments') ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
-                      {isSectionExpanded(index, 'emailContent') && (
-                        <div className="bg-white p-4 border-t border-gray-200">
-                          <EmailContent email={item} />
+                      {isSectionExpanded(index, 'textSegments') && (
+                        <div className="bg-white p-4 border-t border-gray-200 space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Pretext</label>
+                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[60px] max-h-[120px] overflow-y-auto">
+                              {item.pretext || <span className="text-gray-400 italic">No pretext</span>}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Core Text</label>
+                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[60px] max-h-[120px] overflow-y-auto">
+                              {item.core || <span className="text-gray-400 italic">No core text</span>}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Posttext</label>
+                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[60px] max-h-[120px] overflow-y-auto">
+                              {item.posttext || <span className="text-gray-400 italic">No posttext</span>}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Clean Text</label>
+                            <div className="bg-gray-50 rounded p-3 text-sm border border-gray-200 min-h-[80px] max-h-[160px] overflow-y-auto">
+                              {item.clean_text || <span className="text-gray-400 italic">No clean text</span>}
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
 
-                    {/* Analysis Section Accordion */}
+                    {/* Process Information Accordion */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={() => toggleSection(index, 'analysisSection')}
-                        className="w-full px-4 py-3 bg-orange-50 hover:bg-orange-100 transition-colors flex justify-between items-center text-left"
+                        onClick={() => toggleSection(index, 'processInfo')}
+                        className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors flex justify-between items-center text-left"
                       >
-                        <span className="font-semibold text-gray-900">AI Analysis</span>
+                        <span className="font-semibold text-gray-900">Process Information</span>
                         <ChevronDownIcon 
                           className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
-                            isSectionExpanded(index, 'analysisSection') ? 'rotate-180' : ''
+                            isSectionExpanded(index, 'processInfo') ? 'rotate-180' : ''
                           }`}
                         />
                       </button>
-                      {isSectionExpanded(index, 'analysisSection') && (
+                      {isSectionExpanded(index, 'processInfo') && (
                         <div className="bg-white p-4 border-t border-gray-200">
-                          <AnalysisSection email={item} validations={actionItems[item.recId]} />
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                            {Object.entries(item).map(([key, value]) => {
+                              // Skip fields that have their own accordions or are irrelevant here
+                              if (['pretext', 'core', 'posttext', 'clean_text', 'original_email', 'translated_content', 'analysis_result', 'reply', 'reply_draft', 'Replypayload', 'replypayload', 'replyPayload'].includes(key)) {
+                                return null;
+                              }
+                              
+                              let displayValue = String(value ?? '');
+                              if (typeof value === 'object' && value !== null) {
+                                displayValue = JSON.stringify(value);
+                              } else if (key === 'createdAt' || key === 'created_at' || key === 'modifiedAt') {
+                                displayValue = new Date(String(value)).toLocaleString();
+                              } else if (typeof value === 'boolean') {
+                                displayValue = value ? 'Yes' : 'No';
+                              }
+
+                              return (
+                                <div key={key} className="flex flex-col border-b border-gray-100 pb-2">
+                                  <span className="text-gray-500 font-medium capitalize mb-1">{key.replace(/_/g, ' ')}</span>
+                                  <span className="font-semibold text-gray-900 break-words">{displayValue || '-'}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                     </div>

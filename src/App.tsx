@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/platform" element={<PlatformPage />} />
-        <Route path="/server" element={<EmailsPage />} />
+        {/* <Route path="/server" element={<EmailsPage />} /> */}
         <Route path="/results" element={<ProcessResultsPage />} />
       </Routes>
     </BrowserRouter>
