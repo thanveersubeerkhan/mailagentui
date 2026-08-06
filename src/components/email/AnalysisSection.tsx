@@ -248,17 +248,24 @@ export const AnalysisSection = ({ email }: AnalysisSectionProps) => {
           >
             <div className="space-y-3">
               {analysis_result.action_items.map((item: any, index: any) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-gray-900 font-medium">{item.action}</span>
+                <div key={index} className="flex flex-col p-4 bg-gray-50 rounded-lg border border-gray-200 gap-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-gray-900 font-medium">{item.action}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <ConfidenceBar confidence={item.confidence} showLabel={false} />
+                      <span className="text-sm text-gray-600 font-medium w-12">
+                        {Math.round(item.confidence * 100)}%
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <ConfidenceBar confidence={item.confidence} showLabel={false} />
-                    <span className="text-sm text-gray-600 font-medium w-12">
-                      {Math.round(item.confidence * 100)}%
-                    </span>
-                  </div>
+                  {item.data && (
+                    <div className="mt-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-md p-3 overflow-x-auto font-mono text-gray-800 shadow-sm">
+                      <pre>{JSON.stringify(item.data, null, 2)}</pre>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
