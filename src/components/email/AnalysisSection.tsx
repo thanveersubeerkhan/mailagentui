@@ -67,6 +67,7 @@ export interface Email {
 
 interface AnalysisSectionProps {
   email: any;
+  validations?: any[];
 }
 
 interface AccordionSectionProps {
@@ -112,7 +113,7 @@ const AccordionSection = ({ title, isOpen, onToggle, children, badge }: Accordio
   );
 };
 
-export const AnalysisSection = ({ email }: AnalysisSectionProps) => {
+export const AnalysisSection = ({ email, validations }: AnalysisSectionProps) => {
   let parsed_analysis: any = {};
   try {
     parsed_analysis = typeof email.analysis_result === 'string' && email.analysis_result 
@@ -139,11 +140,11 @@ export const AnalysisSection = ({ email }: AnalysisSectionProps) => {
   };
 
   const [openSections, setOpenSections] = useState({
-    summary: false,
-    classification: false,
-    action: false,
-    structuredData: false,
-    actionItems: analysis_result.action_items.length > 0,
+    summary: true,
+    classification: true,
+    action: true,
+    structuredData: true,
+    actionItems: true,
     confidence: false
   });
 
@@ -247,27 +248,57 @@ export const AnalysisSection = ({ email }: AnalysisSectionProps) => {
             badge={analysis_result.action_items.length + " actions"}
           >
             <div className="space-y-3">
-              {analysis_result.action_items.map((item: any, index: any) => (
-                <div key={index} className="flex flex-col p-4 bg-gray-50 rounded-lg border border-gray-200 gap-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-gray-900 font-medium">{item.action}</span>
+              {analysis_result.action_items.map((item: any, index: any) => {
+                const validation = validations?.find(v => v.action_item_name === item.action);
+                const isSuccess = validation?.validation_payload?.success;
+                const errors = validation?.validation_payload?.errors || [];
+                const neededFields = validation?.validation_payload?.neededFields || [];
+
+                return (
+                  <div key={index} className="flex flex-col p-4 bg-gray-50 rounded-lg border border-gray-200 gap-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <span className="text-gray-900 font-medium">{item.action}</span>
+                        {validation && (
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${validation.status === 'ready' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                            {validation.status}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <ConfidenceBar confidence={item.confidence} showLabel={false} />
+                        <span className="text-sm text-gray-600 font-medium w-12">
+                          {Math.round(item.confidence * 100)}%
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <ConfidenceBar confidence={item.confidence} showLabel={false} />
-                      <span className="text-sm text-gray-600 font-medium w-12">
-                        {Math.round(item.confidence * 100)}%
-                      </span>
-                    </div>
+                    {item.data && (
+                      <div className="mt-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-md p-3 overflow-x-auto font-mono text-gray-800 shadow-sm">
+                        <pre>{JSON.stringify(item.data, null, 2)}</pre>
+                      </div>
+                    )}
+                    {validation?.validation_payload && (
+                      <div className={`mt-2 text-sm p-3 rounded-md border ${isSuccess ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                        <p className="font-semibold">{validation.validation_payload.message || (isSuccess ? "Validation passed" : "Validation failed")}</p>
+                        {!isSuccess && errors.length > 0 && (
+                          <ul className="list-disc pl-5 mt-1 space-y-1">
+                            {errors.map((err: any, idx: number) => (
+                              <li key={idx}>{err.message}</li>
+                            ))}
+                          </ul>
+                        )}
+                        {!isSuccess && neededFields.length > 0 && (
+                          <div className="mt-2">
+                            <span className="font-semibold">Needed Fields: </span>
+                            {neededFields.join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  {item.data && (
-                    <div className="mt-2 text-xs sm:text-sm bg-white border border-gray-200 rounded-md p-3 overflow-x-auto font-mono text-gray-800 shadow-sm">
-                      <pre>{JSON.stringify(item.data, null, 2)}</pre>
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </AccordionSection>
         )}

@@ -391,7 +391,7 @@ export function ProcessResultsAccordion1({
                       </button>
                       {isSectionExpanded(index, 'analysisSection') && (
                         <div className="bg-white p-4 border-t border-gray-200">
-                          <AnalysisSection email={item} />
+                          <AnalysisSection email={item} validations={actionItems[item.recId]} />
                         </div>
                       )}
                     </div>
