@@ -91,7 +91,8 @@ export default function PlatformPage() {
     const [orderBy, setOrderBy] = useState("CreatedDateTime");
     const [orderDir, setOrderDir] = useState<0 | 1>(0);
     const [oldprocessfetch, setOldprocessfetch] = useState(false);
-const [Close, setClose] = useState(false);
+    const [Close, setClose] = useState(false);
+    const [filterType, setFilterType] = useState<"Tickets" | "Reply">("Tickets");
     const size = 5;
 
     const fetchEmails = async () => {
@@ -100,7 +101,7 @@ const [Close, setClose] = useState(false);
             "https://portal.mawarid.com.sa/apps4x-api/api/v1/data/LGE0000001?entityid=ETN0000041";
         try {
             const res = await fetch(
-                `${baseUrl}&$page=${page}&$size=${size}&$orderby=${orderBy}&$orderbydirection=${orderDir}&$filter:Type=eq:Tickets`,
+                `${baseUrl}&$page=${page}&$size=${size}&$orderby=${orderBy}&$orderbydirection=${orderDir}&$filter:Type=eq:${filterType}`,
                 {
                     headers: {
                         Authorization: `Bearer eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJTeXN0ZW0iLCJOYW1lIjoiU3lzdGVtIiwiRW1haWwiOiJzeXN0ZW1AbWFpbC5jb20iLCJNb2JpbGVOdW1iZXIiOiIwOTg3NjU0MzIxIiwiQ29tcGFueUlkIjoiTEdFMDAwMDAwMSxMR0UwMDAwMDAyIiwiZXhwIjozMzE1Mzk0NjE2LCJpc3MiOiJhcHBzNHguY29tIiwiYXVkIjoiYXBwczR4LmNvbSJ9.YkzrYJ-93k4oNjNSbYWlEum8eh_IAdodZ5vGUIGvVMQ`,
@@ -121,20 +122,20 @@ const [Close, setClose] = useState(false);
         try {
             setOldprocessfetch(true);
             setCompareProcessResults(null);
-            
+
             const response = await fetch(`https://platform-4x-api-andfaucacxhhgwef.canadacentral-01.azurewebsites.net/entities/data/a797bc59-cb99-4c94-a5a2-bed779ddb674?page=1&pageSize=20&filter%5Breq_id%5D=${reqId}`, {
                 headers: {
                     "accept": "*/*",
                     "accept-language": "en-US,en;q=0.9,en-IN;q=0.8",
-                    "x-internal-service-key": "platform4x-internal-key-2026",       
+                    "x-internal-service-key": "platform4x-internal-key-2026",
                     "x-tenant-id": "default"
                 }
             });
-            
+
             if (response.ok) {
                 const rawResult = await response.json();
                 const result = { success: true, data: rawResult.data || [] };
-                
+
                 setOldprocessfetch(false);
                 if (isCompare) {
                     setCompareProcessResults(result);
@@ -152,7 +153,7 @@ const [Close, setClose] = useState(false);
 
     useEffect(() => {
         fetchEmails();
-    }, [page, orderBy, orderDir]);
+    }, [page, orderBy, orderDir, filterType]);
 
     useEffect(() => {
         if (selectedEmail) {
@@ -179,7 +180,7 @@ const [Close, setClose] = useState(false);
                 headers: {
                     "accept": "*/*",
                     "accept-language": "en-US,en;q=0.9,ta;q=0.8,ar;q=0.7",
-                    "x-internal-service-key": "platform4x-internal-key-2026",  
+                    "x-internal-service-key": "platform4x-internal-key-2026",
                     "content-type": "application/json",
                     "x-tenant-id": "default"
                 },
@@ -223,14 +224,14 @@ const [Close, setClose] = useState(false);
     };
 
     const handleOpenEmail = (email: Email) => {
-            
-   
-            setSelectedEmail(email);
-            setCompareEmail(email);
 
-    
+
+        setSelectedEmail(email);
+        setCompareEmail(email);
+
+
         // If main email is already selected, set as compare email
-       
+
         setProcessResult(null);
     };
 
@@ -263,11 +264,24 @@ const [Close, setClose] = useState(false);
                     sidebar={
                         <Card className="h-full">
                             <CardHeader>
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center mb-4">
                                     <h2 className="text-lg font-semibold text-gray-900">Email Inbox</h2>
                                     <span className="text-sm text-gray-500">{emails.length} emails</span>
                                 </div>
-                            
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => { setFilterType("Tickets"); setPage(1); }}
+                                        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filterType === 'Tickets' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                                    >
+                                        Tickets
+                                    </button>
+                                    <button
+                                        onClick={() => { setFilterType("Reply"); setPage(1); }}
+                                        className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${filterType === 'Reply' ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                                    >
+                                        Replies
+                                    </button>
+                                </div>
                             </CardHeader>
                             <div className="overflow-hidden ">
                                 <EmailList
@@ -279,11 +293,11 @@ const [Close, setClose] = useState(false);
                                     onSort={handleSort}
                                     onOpenEmail={handleOpenEmail}
                                     onPageChange={setPage}
-                      
-                                                       
-                                
-                                
-                             
+
+
+
+
+
                                 />
                             </div>
                         </Card>
@@ -295,10 +309,10 @@ const [Close, setClose] = useState(false);
                                     <SimpleEmailDetail
                                         email={selectedEmail}
                                         processing={processing}
-                                      
+
                                         onProcessEmail={(email) => handleProcessEmail(email, false)}
                                         onClose={() => handleCloseEmail(false)}
-                                    
+
                                     />
                                 </div>
                             </Card>
@@ -325,7 +339,8 @@ const [Close, setClose] = useState(false);
                                         onProcessEmail={(email) => handleProcessEmail(email, true)}
                                         onClose={() => {
                                             setClose(true)
-                                            handleCloseEmail(false)}}
+                                            handleCloseEmail(false)
+                                        }}
                                         Loading={oldprocessfetch}
                                     />
                                 </div>
@@ -340,7 +355,8 @@ const [Close, setClose] = useState(false);
                                         <button
                                             onClick={() => {
                                                 setClose(true)
-                                                setCompareEmail(selectedEmail)}}
+                                                setCompareEmail(selectedEmail)
+                                            }}
                                             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                         >
                                             Use Current Email for Comparison
