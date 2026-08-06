@@ -17,7 +17,7 @@ export default function HomePage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl z-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl z-10">
         <Link 
           to="/platform"
           className="group relative bg-white backdrop-blur-xl border border-gray-200 rounded-3xl p-8 hover:bg-gray-50 transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(59,130,246,0.15)] shadow-sm"
@@ -52,6 +52,26 @@ export default function HomePage() {
               Manage your internal infrastructure. View hardware metrics, active processes, and email analysis tools.
             </p>
             <div className="flex items-center text-indigo-600 font-medium group-hover:text-indigo-500 transition-colors">
+              <span>Enter Environment</span>
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+            </div>
+          </div>
+        </Link>
+
+        <Link 
+          to="/results"
+          className="group relative bg-white backdrop-blur-xl border border-gray-200 rounded-3xl p-8 hover:bg-gray-50 transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(34,197,94,0.15)] shadow-sm"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="relative z-10 flex flex-col h-full">
+            <div className="bg-green-100 p-4 rounded-2xl w-fit mb-6 group-hover:scale-110 transition-transform duration-500">
+              <Server className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Process Results</h2>
+            <p className="text-gray-600 mb-8 flex-grow">
+              View all processed items, analyze the AI results directly, and view process analytics in real-time.
+            </p>
+            <div className="flex items-center text-green-600 font-medium group-hover:text-green-500 transition-colors">
               <span>Enter Environment</span>
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
             </div>

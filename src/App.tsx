@@ -3,6 +3,8 @@ import HomePage from './pages/HomePage';
 import PlatformPage from './pages/platform/page';
 import EmailsPage from './pages/finalui/page';
 
+import ProcessResultsPage from './pages/results/page.tsx';
+
 function App() {
   return (
     <BrowserRouter>
@@ -10,6 +12,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/platform" element={<PlatformPage />} />
         <Route path="/server" element={<EmailsPage />} />
+        <Route path="/results" element={<ProcessResultsPage />} />
       </Routes>
     </BrowserRouter>
   )
