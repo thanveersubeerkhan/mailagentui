@@ -142,7 +142,6 @@ export const AnalysisSection = ({ email, validations }: AnalysisSectionProps) =>
   const [openSections, setOpenSections] = useState({
     summary: true,
     classification: true,
-    action: true,
     structuredData: true,
     actionItems: true,
     confidence: false
@@ -203,31 +202,7 @@ export const AnalysisSection = ({ email, validations }: AnalysisSectionProps) =>
           </div>
         </AccordionSection>
 
-        {/* Next Best Action Accordion */}
-        <AccordionSection
-          title="Recommended Action"
-          isOpen={openSections.action}
-          onToggle={() => toggleSection('action')}
-          badge="Important"
-        >
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-8 bg-blue-500 rounded-full"></div>
-                <div>
-                  <p className="text-blue-900 font-medium text-lg">{analysis_result.next_best_action}</p>
-                  <p className="text-blue-700 text-sm mt-1">{analysis_result.action_reasoning}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <ConfidenceBar confidence={analysis_result.action_confidence} showLabel={false} />
-                <span className="text-blue-800 font-medium">
-                  {Math.round(analysis_result.action_confidence * 100)}%
-                </span>
-              </div>
-            </div>
-          </div>
-        </AccordionSection>
+
 
         {/* Structured Data Accordion */}
         <AccordionSection

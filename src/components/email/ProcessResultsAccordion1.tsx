@@ -213,7 +213,7 @@ export function ProcessResultsAccordion1({
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
                             {Object.entries(item).map(([key, value]) => {
                               // Skip fields that have their own accordions or are irrelevant here
-                              if (['pretext', 'core', 'posttext', 'clean_text', 'original_email', 'translated_content', 'analysis_result'].includes(key)) {
+                              if (['pretext', 'core', 'posttext', 'clean_text', 'original_email', 'translated_content', 'analysis_result', 'reply', 'reply_draft', 'Replypayload', 'replypayload', 'replyPayload'].includes(key)) {
                                 return null;
                               }
                               
@@ -352,6 +352,41 @@ export function ProcessResultsAccordion1({
                           ) : (
                             <div className="text-center text-gray-500 py-4">No action items found for this process.</div>
                           )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Reply Accordion */}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => toggleSection(index, 'replySection')}
+                        className="w-full px-4 py-3 bg-teal-50 hover:bg-teal-100 transition-colors flex justify-between items-center text-left"
+                      >
+                        <span className="font-semibold text-gray-900">Reply</span>
+                        <ChevronDownIcon 
+                          className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
+                            isSectionExpanded(index, 'replySection') ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                      {isSectionExpanded(index, 'replySection') && (
+                        <div className="bg-white p-4 border-t border-gray-200 space-y-4">
+                          {(() => {
+                            const replyContent = (item as any).Replypayload || (item as any).replypayload || (item as any).replyPayload || analysis_result.reply_draft || analysis_result.reply || analysis_result.draft_reply || (item as any).reply || (item as any).reply_draft;
+                            if (replyContent) {
+                              return (
+                                <div className="bg-gray-50 rounded p-4 text-sm border border-gray-200 shadow-sm">
+                                  <div className="font-semibold text-gray-900 border-b border-gray-200 pb-3 mb-3">
+                                    Subject: Re: {original_email?.subject || 'No subject'}
+                                  </div>
+                                  <div className="whitespace-pre-wrap font-mono text-gray-800 leading-relaxed">
+                                    {replyContent}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return <span className="text-gray-400 italic">No reply generated.</span>;
+                          })()}
                         </div>
                       )}
                     </div>
