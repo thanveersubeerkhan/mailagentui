@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EmailContent } from "./EmailContent";
 import { AnalysisSection } from "./AnalysisSection";
 import { AnalysisIcon, ChevronDownIcon } from "../ui/Icons";
 
 export interface ProcessResultItem {
-  id: number;
+  id: string | number;
+  recId: number;
   req_id: string;
   process_label: string;
   pretext: string;
@@ -44,6 +45,39 @@ export function ProcessResultsAccordion1({
 }: ProcessResultsAccordionProps) {
   const [showRawAnalysis, setShowRawAnalysis] = useState<{ [key: number]: boolean }>({});
   const [expandedSections, setExpandedSections] = useState<{ [key: number]: { [section: string]: boolean } }>({});
+  const [actionItems, setActionItems] = useState<{ [key: string]: any[] }>({});
+  const [loadingActionItems, setLoadingActionItems] = useState<{ [key: string]: boolean }>({});
+
+  useEffect(() => {
+    if (expandedProcess !== null && processResults[expandedProcess]) {
+      const item = processResults[expandedProcess] as any;
+      const filterId = item.recId;
+      if (filterId && !actionItems[filterId]) {
+        fetchActionItems(filterId);
+      }
+    }
+  }, [expandedProcess, processResults]);
+
+  const fetchActionItems = async (filterId: string | number) => {
+    setLoadingActionItems(prev => ({ ...prev, [filterId]: true }));
+    try {
+      const res = await fetch(`https://platform-4x-api-andfaucacxhhgwef.canadacentral-01.azurewebsites.net/entities/data/a3a9946b-b26e-4ee7-b034-f70e35c96820?page=1&pageSize=20&filter%5Breprocess_id%5D=${filterId}`, {
+        headers: {
+          "accept": "*/*",
+          "x-internal-service-key": "platform4x-internal-key-2026",
+          "x-tenant-id": "default"
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setActionItems(prev => ({ ...prev, [filterId]: data.data || [] }));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingActionItems(prev => ({ ...prev, [filterId]: false }));
+    }
+  };
 
   const formatConfidence = (confidence: number) => {
     return `${(confidence * 100).toFixed(0)}%`;
@@ -176,25 +210,29 @@ export function ProcessResultsAccordion1({
                       </button>
                       {isSectionExpanded(index, 'processInfo') && (
                         <div className="bg-white p-4 border-t border-gray-200">
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Process ID:</span>
-                              <span className="font-medium">{item.id}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Request ID:</span>
-                              <span className="font-medium">{item.req_id}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Process Label:</span>
-                              <span className="font-medium">{item.process_label}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-gray-600">Created:</span>
-                              <span className="font-medium">
-                                {new Date(createdAt).toLocaleString()}
-                              </span>
-                            </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                            {Object.entries(item).map(([key, value]) => {
+                              // Skip fields that have their own accordions or are irrelevant here
+                              if (['pretext', 'core', 'posttext', 'clean_text', 'original_email', 'translated_content', 'analysis_result'].includes(key)) {
+                                return null;
+                              }
+                              
+                              let displayValue = String(value ?? '');
+                              if (typeof value === 'object' && value !== null) {
+                                displayValue = JSON.stringify(value);
+                              } else if (key === 'createdAt' || key === 'created_at' || key === 'modifiedAt') {
+                                displayValue = new Date(String(value)).toLocaleString();
+                              } else if (typeof value === 'boolean') {
+                                displayValue = value ? 'Yes' : 'No';
+                              }
+
+                              return (
+                                <div key={key} className="flex flex-col border-b border-gray-100 pb-2">
+                                  <span className="text-gray-500 font-medium capitalize mb-1">{key.replace(/_/g, ' ')}</span>
+                                  <span className="font-semibold text-gray-900 break-words">{displayValue || '-'}</span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
@@ -243,8 +281,80 @@ export function ProcessResultsAccordion1({
                       )}
                     </div>
 
-                
-                   
+                    {/* Action Items Validations Accordion */}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => toggleSection(index, 'apiActionItems')}
+                        className="w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors flex justify-between items-center text-left"
+                      >
+                        <span className="font-semibold text-gray-900 flex items-center gap-2">
+                          Action Items Validations
+                          {actionItems[item.recId] && (
+                            <span className="bg-blue-200 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                              {actionItems[item.recId].length}
+                            </span>
+                          )}
+                        </span>
+                        <ChevronDownIcon 
+                          className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
+                            isSectionExpanded(index, 'apiActionItems') ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
+                      {isSectionExpanded(index, 'apiActionItems') && (
+                        <div className="bg-white p-4 border-t border-gray-200">
+                          {loadingActionItems[item.recId] ? (
+                            <div className="text-center text-gray-500 py-4">Loading action items...</div>
+                          ) : actionItems[item.recId] && actionItems[item.recId].length > 0 ? (
+                            <div className="space-y-4">
+                              {actionItems[item.recId].map((actionItem: any, i: number) => {
+                                const isSuccess = actionItem.validation_payload?.success;
+                                const errors = actionItem.validation_payload?.errors || [];
+                                const neededFields = actionItem.validation_payload?.neededFields || [];
+                                
+                                return (
+                                  <div key={i} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                    <div className="flex items-center justify-between mb-3">
+                                      <h4 className="font-medium text-gray-900">{actionItem.action_item_name || 'Action Item'}</h4>
+                                      <span className={`px-2 py-1 rounded text-xs font-medium ${actionItem.status === 'ready' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                                        {actionItem.status || 'Unknown'}
+                                      </span>
+                                    </div>
+                                    
+                                    {actionItem.data && (
+                                      <div className="mb-3 text-xs sm:text-sm bg-white border border-gray-200 rounded-md p-3 overflow-x-auto font-mono text-gray-800 shadow-sm">
+                                        <pre>{JSON.stringify(actionItem.data, null, 2)}</pre>
+                                      </div>
+                                    )}
+
+                                    {actionItem.validation_payload && (
+                                      <div className={`text-sm p-3 rounded-md border ${isSuccess ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                                        <p className="font-semibold">{actionItem.validation_payload.message || (isSuccess ? "Validation passed" : "Validation failed")}</p>
+                                        {!isSuccess && errors.length > 0 && (
+                                          <ul className="list-disc pl-5 mt-1 space-y-1">
+                                            {errors.map((err: any, idx: number) => (
+                                              <li key={idx}>{err.message}</li>
+                                            ))}
+                                          </ul>
+                                        )}
+                                        {!isSuccess && neededFields.length > 0 && (
+                                          <div className="mt-2">
+                                            <span className="font-semibold">Needed Fields: </span>
+                                            {neededFields.join(", ")}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="text-center text-gray-500 py-4">No action items found for this process.</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Email Content Accordion */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
