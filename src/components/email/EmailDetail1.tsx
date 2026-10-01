@@ -45,17 +45,28 @@ export function SimpleEmailDetail({
             <h2 className="text-lg font-bold text-gray-900 mb-1 truncate">
               {email.Subject || 'No Subject'}
             </h2>
-            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-              <span className="truncate">From: {email.From}</span>
-              <span>•</span>
-              <span>{new Date(email.CreatedDateTime).toLocaleDateString()}</span>
-              {email.TicketId && (
-                <>
-                  <span>•</span>
-                  <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
-                    Ticket: {email.TicketId}
-                  </span>
-                </>
+            <div className="flex flex-col gap-1 text-sm text-gray-600 mt-2">
+              <div className="flex items-center gap-2">
+                <span className="truncate"><strong>From:</strong> {email.From}</span>
+                <span>•</span>
+                <span>{new Date(email.CreatedDateTime).toLocaleDateString()}</span>
+                {email.TicketId && (
+                  <>
+                    <span>•</span>
+                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs">
+                      Ticket: {email.TicketId}
+                    </span>
+                  </>
+                )}
+              </div>
+              {email.ToRecipients && (
+                <div className="truncate"><strong>To:</strong> {email.ToRecipients}</div>
+              )}
+              {email.CcRecipients && (
+                <div className="truncate"><strong>Cc:</strong> {email.CcRecipients}</div>
+              )}
+              {email.BccRecipients && (
+                <div className="truncate"><strong>Bcc:</strong> {email.BccRecipients}</div>
               )}
             </div>
           </div>
