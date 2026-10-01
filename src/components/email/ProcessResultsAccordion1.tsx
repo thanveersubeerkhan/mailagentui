@@ -258,7 +258,7 @@ export function ProcessResultsAccordion1({
                           <div className="bg-white p-4 border-t border-gray-200 space-y-4">
                             {(item as any).actionitems.actionitems.map((actItem: any, idx: number) => {
                               let entries: [string, any][] = [];
-                              if (actItem.actiontype === "others" && Array.isArray(actItem.data)) {
+                              if (Array.isArray(actItem.data)) {
                                 entries = actItem.data.map((d: any) => [d.key, d.value]);
                               } else {
                                 entries = Object.entries(actItem).filter(([k]) => k !== "actiontype");
