@@ -235,80 +235,61 @@ export function ProcessResultsAccordion1({
                       )}
                     </div>
 
-                    {/* Action Items Validations Accordion */}
-                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => toggleSection(index, 'apiActionItems')}
-                        className="w-full px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors flex justify-between items-center text-left"
-                      >
-                        <span className="font-semibold text-gray-900 flex items-center gap-2">
-                          Action Items Validations
-                          {actionItems[item.recId] && (
-                            <span className="bg-blue-200 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
-                              {actionItems[item.recId].length}
+                    {/* Extracted Action Items Accordion */}
+                    {(item as any).actionitems?.actionitems && (item as any).actionitems.actionitems.length > 0 && (
+                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => toggleSection(index, 'extractedActionItems')}
+                          className="w-full px-4 py-3 bg-indigo-50 hover:bg-indigo-100 transition-colors flex justify-between items-center text-left"
+                        >
+                          <span className="font-semibold text-gray-900 flex items-center gap-2">
+                            Extracted Action Items
+                            <span className="bg-indigo-200 text-indigo-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                              {(item as any).actionitems.actionitems.length}
                             </span>
-                          )}
-                        </span>
-                        <ChevronDownIcon 
-                          className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
-                            isSectionExpanded(index, 'apiActionItems') ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </button>
-                      {isSectionExpanded(index, 'apiActionItems') && (
-                        <div className="bg-white p-4 border-t border-gray-200">
-                          {loadingActionItems[item.recId] ? (
-                            <div className="text-center text-gray-500 py-4">Loading action items...</div>
-                          ) : actionItems[item.recId] && actionItems[item.recId].length > 0 ? (
-                            <div className="space-y-4">
-                              {actionItems[item.recId].map((actionItem: any, i: number) => {
-                                const isSuccess = actionItem.validation_payload?.success;
-                                const errors = actionItem.validation_payload?.errors || [];
-                                const neededFields = actionItem.validation_payload?.neededFields || [];
-                                
-                                return (
-                                  <div key={i} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                                    <div className="flex items-center justify-between mb-3">
-                                      <h4 className="font-medium text-gray-900">{actionItem.action_item_name || 'Action Item'}</h4>
-                                      <span className={`px-2 py-1 rounded text-xs font-medium ${actionItem.status === 'ready' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                        {actionItem.status || 'Unknown'}
-                                      </span>
-                                    </div>
-                                    
-                                    {actionItem.data && (
-                                      <div className="mb-3 text-xs sm:text-sm bg-white border border-gray-200 rounded-md p-3 overflow-x-auto font-mono text-gray-800 shadow-sm">
-                                        <pre>{JSON.stringify(actionItem.data, null, 2)}</pre>
-                                      </div>
-                                    )}
+                          </span>
+                          <ChevronDownIcon 
+                            className={`w-4 h-4 text-gray-400 transform transition-transform duration-200 ${
+                              isSectionExpanded(index, 'extractedActionItems') ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+                        {isSectionExpanded(index, 'extractedActionItems') && (
+                          <div className="bg-white p-4 border-t border-gray-200 space-y-4">
+                            {(item as any).actionitems.actionitems.map((actItem: any, idx: number) => {
+                              let entries: [string, any][] = [];
+                              if (actItem.actiontype === "others" && Array.isArray(actItem.data)) {
+                                entries = actItem.data.map((d: any) => [d.key, d.value]);
+                              } else {
+                                entries = Object.entries(actItem).filter(([k]) => k !== "actiontype");
+                              }
 
-                                    {actionItem.validation_payload && (
-                                      <div className={`text-sm p-3 rounded-md border ${isSuccess ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'}`}>
-                                        <p className="font-semibold">{actionItem.validation_payload.message || (isSuccess ? "Validation passed" : "Validation failed")}</p>
-                                        {!isSuccess && errors.length > 0 && (
-                                          <ul className="list-disc pl-5 mt-1 space-y-1">
-                                            {errors.map((err: any, idx: number) => (
-                                              <li key={idx}>{err.message}</li>
-                                            ))}
-                                          </ul>
-                                        )}
-                                        {!isSuccess && neededFields.length > 0 && (
-                                          <div className="mt-2">
-                                            <span className="font-semibold">Needed Fields: </span>
-                                            {neededFields.join(", ")}
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
+                              return (
+                                <div key={idx} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                  <div className="flex items-center justify-between mb-3 border-b border-gray-200 pb-2">
+                                    <h4 className="font-medium text-gray-900 capitalize">
+                                      {String(actItem.actiontype || 'Unknown').replace(/_/g, ' ')}
+                                    </h4>
+                                    <span className="px-2 py-1 rounded text-xs font-medium bg-indigo-100 text-indigo-700">
+                                      Extracted
+                                    </span>
                                   </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <div className="text-center text-gray-500 py-4">No action items found for this process.</div>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                    {entries.map(([key, value]) => (
+                                      <div key={key} className="flex flex-col bg-white p-2 rounded border border-gray-100 shadow-sm">
+                                        <span className="text-gray-500 font-medium capitalize mb-1 text-xs">{key.replace(/_/g, ' ')}</span>
+                                        <span className="font-semibold text-gray-900 break-words">{String(value ?? '-')}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
 
                     {/* Reply Accordion */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
