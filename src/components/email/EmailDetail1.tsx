@@ -48,8 +48,6 @@ export function SimpleEmailDetail({
             <div className="flex flex-col gap-1 text-sm text-gray-600 mt-2">
               <div className="flex items-center gap-2">
                 <span className="truncate"><strong>From:</strong> {email.From}</span>
-                <span>•</span>
-                <span>{new Date(email.CreatedDateTime).toLocaleDateString()}</span>
                 {email.TicketId && (
                   <>
                     <span>•</span>
@@ -58,6 +56,18 @@ export function SimpleEmailDetail({
                     </span>
                   </>
                 )}
+              </div>
+              <div className="truncate">
+                <strong>Sent:</strong> {new Date(email.CreatedDateTime).toLocaleString('en-GB', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: false
+                })}
               </div>
               {email.ToRecipients && (
                 <div className="truncate"><strong>To:</strong> {email.ToRecipients}</div>
